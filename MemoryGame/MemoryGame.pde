@@ -2,18 +2,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 // ESTADOS DO JOGO
-final int MENU = 0, PLAYING = 1, LEVEL_COMPLETE = 2, GAME_OVER = 3, GAME_COMPLETE = 4, PAUSED = 5;;
+final int MENU = 0, PLAYING = 1, LEVEL_COMPLETE = 2, GAME_OVER = 3, GAME_COMPLETE = 4, PAUSED = 5;
 int gameState = MENU;
 
 // MODOS DE JOGO
 final int MODE_PROGRESSIVO = 0, MODE_INDIVIDUAL = 1;
-int gameMode = MODE_PROGRESSIVO;  // padrão: progressivo
+int gameMode = MODE_PROGRESSIVO;
 
 // CONFIGURAÇÕES DOS NÍVEIS
-// Níveis: 2x2, 3x4 e 4x5
 final int[][] LEVELS = { {2, 2}, {3, 4}, {4, 4} };
 final String[] LEVEL_NAMES = {"Iniciante (2x2)", "Treinador (3x4)", "Mestre (4x5)"};
-// Número máximo de tentativas por nível (apenas para modo progressivo, por exemplo)
 final int[] MAX_ATTEMPTS = { 3, 10, 15 };
 final int[] LEVEL_TIME_LIMITS = { 15000, 30000, 75000 };
 
@@ -37,11 +35,11 @@ PImage backgroundImg2;
 boolean lockInput = false;
 int currentLevel = 0;
 int score = 0;
-int levelStartTime;    // Início do nível
-int levelEndTime = -1; // Momento em que o nível foi concluído (-1 se ainda não terminou)
-int revealStartTime;   // Para delay de 1s quando as cartas não batem
+int levelStartTime;
+int levelEndTime = -1;
+int revealStartTime;
 int attempts = 0;
-boolean levelBonusApplied = false; // Aplica o bônus apenas uma vez
+boolean levelBonusApplied = false;
 int pauseStartTime = 0;
 int totalPausedTime = 0;
 
@@ -53,6 +51,7 @@ boolean nameEntered = false;
 class RankingEntry {
   String name;
   int score;
+
   RankingEntry(String name, int score) {
     this.name = name;
     this.score = score;
@@ -64,11 +63,11 @@ ArrayList<RankingEntry> ranking = new ArrayList<RankingEntry>();
 final int CARD_MARGIN = 10;
 final int CARD_ROUNDING = 12;
 
-// ÍCONES PARA A INTERFACE (coloque estes arquivos na pasta "data")
+// ÍCONES PARA A INTERFACE
 PImage timeIcon, attemptsIcon, scoreIcon;
 
 HashMap<String, Theme> themes = new HashMap<String, Theme>();
-String currentThemeName = "Pokemon"; // 
+String currentThemeName = "Pokemon";
 boolean selectingTheme = false;
 
 void settings() {
@@ -76,11 +75,10 @@ void settings() {
 }
 
 void setup() {
-  // Carrega os ícones (arquivos na pasta "data")
   timeIcon = loadImage("timeIcon.png");
   attemptsIcon = loadImage("attemptsIcon.png");
   scoreIcon = loadImage("scoreIcon.png");
-  
+
   String[] pokePaths = {
     "themes/pokemon/zoroark.png",
     "themes/pokemon/charmeleon.png",
@@ -93,14 +91,17 @@ void setup() {
     "themes/pokemon/snorlax.png",
     "themes/pokemon/gengar.png"
   };
-  themes.put("Pokemon", new Theme("Pokemon",pokePaths,
-  "themes/pokemon/cardback.jpg",
-   "themes/pokemon/background.png",
-   "themes/pokemon/background22.jpg",
-   "themes/pokemon/levelbackground.jpg"));
-    
+  themes.put("Pokemon", new Theme(
+    "Pokemon",
+    pokePaths,
+    "themes/pokemon/cardback.jpg",
+    "themes/pokemon/background.png",
+    "themes/pokemon/background22.jpg",
+    "themes/pokemon/levelbackground.jpg"
+  ));
+
   String[] animePaths = {
-    "themes/hxh/gon.png", 
+    "themes/hxh/gon.png",
     "themes/hxh/killua.png",
     "themes/hxh/hisoka.png",
     "themes/hxh/shizuku.png",
@@ -111,19 +112,20 @@ void setup() {
     "themes/hxh/netero.png",
     "themes/hxh/leorio.png"
   };
-    themes.put("HXH", new Theme("HXH",animePaths,
-  "themes/hxh/cardback.jpg",
-   "themes/hxh/background3.jpg",
-   "themes/hxh/background222.jpg",
-   "themes/hxh/levelbackground.png"));
-  
-  
+  themes.put("HXH", new Theme(
+    "HXH",
+    animePaths,
+    "themes/hxh/cardback.jpg",
+    "themes/hxh/background3.jpg",
+    "themes/hxh/background222.jpg",
+    "themes/hxh/levelbackground.png"
+  ));
+
   rectMode(CORNER);
   textFont(createFont("Arial", 20));
   surface.setTitle("Jogo da Memória - Menu");
-  applyTheme("Pokemon"); 
+  applyTheme("Pokemon");
   loadAssets();
-  
 }
 
 void applyTheme(String name) {
@@ -138,8 +140,9 @@ void applyTheme(String name) {
     t.playingBackground.resize(width, height);
     t.levelCompleteBackground.resize(width, height);
   }
-   cardBackRounded = createRoundedImage(cardBackImg, 10);
+  cardBackRounded = createRoundedImage(cardBackImg, 10);
 }
+
 void loadAssets() {
   Theme currentTheme = themes.get(currentThemeName);
   if (currentTheme == null) return;
@@ -164,10 +167,8 @@ void loadAssets() {
 }
 
 void resetToMenu() {
-  // Limpa as cartas
   if (cards != null) cards.clear();
 
-  // Reseta variáveis de jogo
   firstCard = null;
   secondCard = null;
   lockInput = false;
@@ -177,12 +178,7 @@ void resetToMenu() {
   levelEndTime = -1;
   totalPausedTime = 0;
   levelBonusApplied = false;
-
-  // Se quiser, reseta level atual também
   currentLevel = 0;
-
-  // Pode também limpar input do player, se quiser reiniciar tudo:
-  // playerName = "";
 }
 
 void draw() {
@@ -195,9 +191,8 @@ void draw() {
   } else {
     background(255);
   }
-  
-  // Desenha o conteúdo conforme o estado do jogo:
-  switch(gameState) {
+
+  switch (gameState) {
     case MENU:
       drawMenu();
       break;
@@ -218,8 +213,7 @@ void draw() {
       drawGameComplete();
       break;
   }
-  
-  // Se cartas erradas estão sendo mostradas, esconde-as após 0.5s
+
   if (lockInput && millis() - revealStartTime > 500) {
     if (firstCard != null) firstCard.hide();
     if (secondCard != null) secondCard.hide();
@@ -228,58 +222,46 @@ void draw() {
   }
 }
 
-
-//////////////////////////////
-// MENU DE PAUSA (modal)
-//////////////////////////////
 void drawPauseMenu() {
-  // Tela semi-transparente sobre o jogo
   fill(0, 150);
   rect(0, 0, width, height);
-  
-  // Janela modal centralizada
+
   int modalWidth = 300, modalHeight = 250;
-  int modalX = width/2 - modalWidth/2;
-  int modalY = height/2 - modalHeight/2;
+  int modalX = width / 2 - modalWidth / 2;
+  int modalY = height / 2 - modalHeight / 2;
   fill(255);
   rect(modalX, modalY, modalWidth, modalHeight, 10);
-  
+
   fill(0);
   textSize(24);
   textAlign(CENTER, CENTER);
-  text("Pausado", width/2, modalY + 40);
-  
-  // Botões na janela modal
+  text("Pausado", width / 2, modalY + 40);
+
   int btnWidth = 200, btnHeight = 40;
-  int btnX = width/2;
+  int btnX = width / 2;
   int btnY = modalY + 80;
-  
-  // Botão "Continuar"
+
   fill(#3498DB);
   rectMode(CENTER);
   rect(btnX, btnY, btnWidth, btnHeight, 10);
   fill(255);
   textSize(20);
   text("Continuar", btnX, btnY);
-  
-  // Botão "Menu"
+
   btnY += btnHeight + 20;
   fill(#3498DB);
   rect(btnX, btnY, btnWidth, btnHeight, 10);
   fill(255);
   text("Menu", btnX, btnY);
-  
-  // Botão "Sair"
+
   btnY += btnHeight + 20;
   fill(#3498DB);
   rect(btnX, btnY, btnWidth, btnHeight, 10);
   fill(255);
   text("Sair", btnX, btnY);
-  
+
   rectMode(CORNER);
 }
-
-
 
 //////////////////////////////
 // MENU INICIAL
@@ -992,10 +974,9 @@ void display() {
     return this.img == other.img;
   }
 }
-
 void generateCards(int level, Theme theme) {
   cards.clear();
-  
+
   int cols = LEVELS[level][0];
   int rows = LEVELS[level][1];
   int totalPairs = (cols * rows) / 2;
@@ -1003,29 +984,30 @@ void generateCards(int level, Theme theme) {
 
   // Calcula tamanho das cartas e centraliza o grid
   int availableWidth = width - 2 * CARD_MARGIN;
-  int availableHeight = height - 100;  // Espaço para UI no topo
+  int availableHeight = height - 100; // Espaço para UI no topo
   int cardSize = min(availableWidth / cols, availableHeight / rows);
   int gridX = (availableWidth - cols * cardSize) / 2 + CARD_MARGIN;
-  int gridY = (availableHeight - rows * cardSize) / 2 + 80; // espaço para UI
+  int gridY = (availableHeight - rows * cardSize) / 2 + 80; // Espaço para UI
 
   ArrayList<Integer> indices = new ArrayList<Integer>();
   for (int i = 0; i < totalPairs; i++) {
     indices.add(i);
-    indices.add(i); // para pares
+    indices.add(i); // Para pares
   }
   Collections.shuffle(indices);
 
   for (int row = 0; row < rows; row++) {
-  for (int col = 0; col < cols; col++) {
-    int x = gridX + col * cardSize;
-    int y = gridY + row * cardSize;
+    for (int col = 0; col < cols; col++) {
+      int x = gridX + col * cardSize;
+      int y = gridY + row * cardSize;
 
-    int index = indices.remove(0);
-    PImage cardImg = images.get(index);  
-    cards.add(new Card(x, y, cardSize, cardImg));
+      int index = indices.remove(0);
+      PImage cardImg = images.get(index);
+      cards.add(new Card(x, y, cardSize, cardImg));
+    }
   }
 }
-}
+
 class Theme {
   String name;
   ArrayList<PImage> cardImages;
@@ -1046,26 +1028,23 @@ class Theme {
     levelCompleteBackground = loadImage(levelBG);
   }
 
-  // Retorna uma lista de imagens únicas duplicadas para formar pares e embaralhadas
- ArrayList<PImage> getShuffledPairs(int pairCount) {
-  // Copia as imagens disponíveis
-  ArrayList<PImage> available = new ArrayList<PImage>(cardImages);
-  Collections.shuffle(available); // Embaralha as imagens disponíveis
+  ArrayList<PImage> getShuffledPairs(int pairCount) {
+    ArrayList<PImage> available = new ArrayList<PImage>(cardImages);
+    Collections.shuffle(available);
 
-  if (available.size() < pairCount) {
-    println("Erro: Tema '" + name + "' não possui imagens suficientes para " + pairCount + " pares.");
-    return new ArrayList<PImage>(); // Retorna lista vazia se faltar imagem
+    if (available.size() < pairCount) {
+      println("Erro: Tema '" + name + "' não possui imagens suficientes para " + pairCount + " pares.");
+      return new ArrayList<PImage>();
+    }
+
+    ArrayList<PImage> selected = new ArrayList<PImage>();
+    for (int i = 0; i < pairCount; i++) {
+      PImage img = available.get(i);
+      selected.add(img);
+      selected.add(img);
+    }
+
+    Collections.shuffle(selected);
+    return selected;
   }
-
-  // Seleciona imagens únicas para formar os pares
-  ArrayList<PImage> selected = new ArrayList<PImage>();
-  for (int i = 0; i < pairCount; i++) {
-    PImage img = available.get(i);  // Garantidamente única
-    selected.add(img);
-    selected.add(img); // Duplica para formar o par
-  }
-
-  Collections.shuffle(selected); // Embaralha os pares
-  return selected;
-}
 }
